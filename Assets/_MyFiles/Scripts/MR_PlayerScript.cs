@@ -26,19 +26,9 @@ public class MR_PlayerScript : MonoBehaviour
         playerController = GetComponent<CharacterController>();
     }
 
-    private void Start()
-    {
-
-    }
-
     private void Update()
     {
         isGrounded = playerController.isGrounded;
-
-        if(playerController.isGrounded )
-        {
-            Debug.Log("I am grounded");
-        }
     }
 
     private void FixedUpdate()
