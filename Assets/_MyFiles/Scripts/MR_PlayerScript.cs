@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class MR_PlayerScript : MonoBehaviour
+public class MR_PlayerScript : NetworkBehaviour
 {
     PlayerControlsScript playerControls;
     CharacterController playerController;
@@ -41,8 +42,15 @@ public class MR_PlayerScript : MonoBehaviour
         ProcessLook();
     }
 
+    /*public override void OnNetworkSpawn()
+    {
+        if (!IsOwner) this.enabled = false;
+    }*/
+
     public void ProcessMovement()
     {
+        if (!IsOwner) return;
+
         Vector2 inputVector = playerControls.Player.Movement.ReadValue<Vector2>();
         Vector3 movementDirection = new Vector3(inputVector.x, 0, inputVector.y);
 
@@ -55,6 +63,8 @@ public class MR_PlayerScript : MonoBehaviour
 
     public void ProcessLook()
     {
+        if (!IsOwner) return;
+
         Vector2 lookVector = playerControls.Player.Look.ReadValue<Vector2>();
         xRotation -= (lookVector.y * Time.deltaTime) * ySensitivity;
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
@@ -64,7 +74,9 @@ public class MR_PlayerScript : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext context)
     {
-        if(context.performed)
+        if (!IsOwner) return;
+
+        if (context.performed)
         {
             Debug.Log("Jump: " + context);
             if(isGrounded)
