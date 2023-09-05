@@ -56,7 +56,8 @@ public class MR_PlayerScript : NetworkBehaviour
 
     private void UpdateLookInput(InputAction.CallbackContext obj)
     {
-        UpdateLookInput_ServerRpc(obj.ReadValue<Vector2>());
+            UpdateLookInput_ServerRpc(obj.ReadValue<Vector2>());
+
     }
 
     private void Start()
@@ -95,11 +96,6 @@ public class MR_PlayerScript : NetworkBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-
-    }
-
     private void LateUpdate()
     {
         if(IsOwner)
@@ -124,20 +120,14 @@ public class MR_PlayerScript : NetworkBehaviour
 
     public void ProcessLook(Vector2 lookVector)
     {
-        
         xRotation -= (lookVector.y * Time.deltaTime) * ySensitivity;
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
         playerCam.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         transform.Rotate(Vector3.up * (lookVector.x * Time.deltaTime) * xSensitivity);
     }
 
-    //[ServerRpc]
     public void Jump(InputAction.CallbackContext context)
     {
-        if(IsClient)
-        {
-            return;
-        }
         Debug.Log("Jump: " + context);
         if(playerController.isGrounded)
         {
