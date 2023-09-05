@@ -20,6 +20,10 @@ public class MR_PlayerScript : NetworkBehaviour
     float xRotation = 0f;
     public float xSensitivity = 30f;
     public float ySensitivity = 30f;
+    public GameObject hunterBody_01;
+    public GameObject hunterBody_02;
+    public GameObject gun_01;
+    public GameObject gun_02;
 
     private NetworkVariable<Vector2> playerLookInput = new NetworkVariable<Vector2>();
 
@@ -30,8 +34,10 @@ public class MR_PlayerScript : NetworkBehaviour
         playerControls.Player.Enable();
         playerController = GetComponent<CharacterController>();
         playerControls.Player.Jump.performed += Jump;
-        playerControls.Player.Look.performed += UPdateLookInput;
+        playerControls.Player.Look.performed += UpdateLookInput;
         playerLookInput.OnValueChanged += ServerLookInputUpdated;
+
+
     }
 
     private void ServerLookInputUpdated(Vector2 previousValue, Vector2 newValue)
@@ -43,23 +49,45 @@ public class MR_PlayerScript : NetworkBehaviour
     [ServerRpc]
     void UpdateLookInput_ServerRpc(Vector2 input)
     {
+        
         playerLookInput.Value = input;
+        
     }
 
-    private void UPdateLookInput(InputAction.CallbackContext obj)
+    private void UpdateLookInput(InputAction.CallbackContext obj)
     {
         UpdateLookInput_ServerRpc(obj.ReadValue<Vector2>());
     }
 
+    private void Start()
+    {
+        if (IsOwner)
+        {
+            hunterBody_01.gameObject.SetActive(true);
+            hunterBody_02.gameObject.SetActive(false);
+            gun_01.gameObject.SetActive(true);
+            gun_02.gameObject.SetActive(false);
+        }
+        else if (IsClient)
+        {
+            hunterBody_01.gameObject.SetActive(false);
+            hunterBody_02.gameObject.SetActive(true);
+            gun_01.gameObject.SetActive(false);
+            gun_02.gameObject.SetActive(true);
+        }
+    }
 
     private void Update()
     {
         playerCam.enabled = IsOwner;
-    }
 
-    private void FixedUpdate()
-    {
-        if(IsOwner)
+        if (IsOwner)
+        {
+            Vector2 inputVector = playerControls.Player.Movement.ReadValue<Vector2>();
+            Vector3 movementDirection = new Vector3(inputVector.x, 0, inputVector.y);
+            ProcessMovement_ServerRpc(movementDirection);
+        }
+        else if (IsClient)
         {
             Vector2 inputVector = playerControls.Player.Movement.ReadValue<Vector2>();
             Vector3 movementDirection = new Vector3(inputVector.x, 0, inputVector.y);
@@ -67,9 +95,13 @@ public class MR_PlayerScript : NetworkBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+
+    }
+
     private void LateUpdate()
     {
-        return;
         if(IsOwner)
         {
             Vector2 lookVector = playerControls.Player.Look.ReadValue<Vector2>();
@@ -77,16 +109,9 @@ public class MR_PlayerScript : NetworkBehaviour
         }
     }
 
-    public override void OnNetworkSpawn()
-    {
-
-    }
     [ServerRpc]
     public void ProcessMovement_ServerRpc(Vector3 movementDirection)
     {
-        
-        //Vector3 movementDirection = new Vector3(inputVector.x, 0, inputVector.y);
-       
         playerVelocity.y += gravity * Time.deltaTime;
         if (playerController.isGrounded && playerVelocity.y < 0)
             playerVelocity.y = -2f;
@@ -106,8 +131,13 @@ public class MR_PlayerScript : NetworkBehaviour
         transform.Rotate(Vector3.up * (lookVector.x * Time.deltaTime) * xSensitivity);
     }
 
+    //[ServerRpc]
     public void Jump(InputAction.CallbackContext context)
     {
+        if(IsClient)
+        {
+            return;
+        }
         Debug.Log("Jump: " + context);
         if(playerController.isGrounded)
         {
