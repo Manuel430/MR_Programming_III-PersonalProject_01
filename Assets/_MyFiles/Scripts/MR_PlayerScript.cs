@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -25,9 +26,6 @@ public class MR_PlayerScript : NetworkBehaviour
     public GameObject gun_01;
     public GameObject gun_02;
 
-    private NetworkVariable<Vector2> playerLookInput = new NetworkVariable<Vector2>();
-
-
     private void Awake()
     {
         playerControls = new PlayerControlsScript();
@@ -35,29 +33,19 @@ public class MR_PlayerScript : NetworkBehaviour
         playerController = GetComponent<CharacterController>();
         playerControls.Player.Jump.performed += Jump;
         playerControls.Player.Look.performed += UpdateLookInput;
-        playerLookInput.OnValueChanged += ServerLookInputUpdated;
-
-
     }
 
-    private void ServerLookInputUpdated(Vector2 previousValue, Vector2 newValue)
+    private void Jump(InputAction.CallbackContext context)
     {
-        ProcessLook(newValue);
-    }
-
-
-    [ServerRpc]
-    void UpdateLookInput_ServerRpc(Vector2 input)
-    {
-        
-        playerLookInput.Value = input;
-        
+        Jump_ServerRpc();
     }
 
     private void UpdateLookInput(InputAction.CallbackContext obj)
     {
-            UpdateLookInput_ServerRpc(obj.ReadValue<Vector2>());
-
+        if (IsOwner)
+        { 
+            ProcessLook(obj.ReadValue<Vector2>());
+        }
     }
 
     private void Start()
@@ -101,7 +89,6 @@ public class MR_PlayerScript : NetworkBehaviour
         if(IsOwner)
         {
             Vector2 lookVector = playerControls.Player.Look.ReadValue<Vector2>();
-            //ProcessLook_ServerRpc(lookVector);
         }
     }
 
@@ -124,19 +111,28 @@ public class MR_PlayerScript : NetworkBehaviour
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
         playerCam.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         transform.Rotate(Vector3.up * (lookVector.x * Time.deltaTime) * xSensitivity);
+        ServerUpdateRotation_ServerRpc(transform.rotation);
+        ServerRotationUpdated_ClientRpc(transform.rotation);
     }
 
-    public void Jump(InputAction.CallbackContext context)
+    [ClientRpc]
+    private void ServerRotationUpdated_ClientRpc(Quaternion rotation)
     {
-        Debug.Log("Jump: " + context);
+        transform.rotation = rotation;
+    }
+
+    [ServerRpc]
+    private void ServerUpdateRotation_ServerRpc(Quaternion rotation)
+    {
+        transform.rotation = rotation;
+    }
+
+    [ServerRpc]
+    public void Jump_ServerRpc()
+    {
         if(playerController.isGrounded)
         {
             playerVelocity.y = Mathf.Sqrt(jumpHeight * -3.0f * gravity);
         }
-    }
-
-    public void MovementDebug(InputAction.CallbackContext context)
-    {
-        Debug.Log(context);
     }
 }
