@@ -55,9 +55,4 @@ public class MR_NetworkManagerUIScript : NetworkBehaviour
         Application.Quit();
     }
 
-    public void Restart()
-    {
-        SceneManager.LoadScene(0);
-    }
-
 }
