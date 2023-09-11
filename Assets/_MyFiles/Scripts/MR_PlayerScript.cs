@@ -98,7 +98,6 @@ public class MR_PlayerScript : NetworkBehaviour
         playerVelocity.y += gravity * Time.deltaTime;
         if (playerController.isGrounded && playerVelocity.y < 0)
             playerVelocity.y = -2f;
-        Debug.Log(playerVelocity);
         Vector3 moveInputVel = transform.TransformDirection(movementDirection) * speed;
         playerVelocity.x = moveInputVel.x;
         playerVelocity.z = moveInputVel.z;
@@ -107,7 +106,7 @@ public class MR_PlayerScript : NetworkBehaviour
 
     public void ProcessLook(Vector2 lookVector)
     {
-        xRotation -= (lookVector.y * Time.deltaTime) * ySensitivity;
+        //xRotation -= (lookVector.y * Time.deltaTime) * ySensitivity;
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
         playerCam.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         transform.Rotate(Vector3.up * (lookVector.x * Time.deltaTime) * xSensitivity);

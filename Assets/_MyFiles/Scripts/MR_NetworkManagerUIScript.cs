@@ -1,30 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MR_NetworkManagerUIScript : MonoBehaviour
+public class MR_NetworkManagerUIScript : NetworkBehaviour
 {
-    [SerializeField] private Button serverButton;
+    [SerializeField] private TMP_Text joinCodeText;
+    [SerializeField] private TMP_InputField joinCodeInput;
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
 
+    public override void OnNetworkSpawn()
+    {
+        joinCodeText.text = MR_TestRelayScript.Instance.JoinCode;
+    }
+
     private void Awake()
     {
-        serverButton.onClick.AddListener(() =>
-        {
-            NetworkManager.Singleton.StartServer();
-        });
-
         hostButton.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.StartHost();
+            hostButton.gameObject.SetActive(false);
+            clientButton.gameObject.SetActive(false);
+            joinCodeInput.gameObject.SetActive(false);
+
+            MR_TestRelayScript.Instance.CreateRelay();
+
+            joinCodeText.gameObject.SetActive(true);
+
         });
 
-        clientButton.onClick.AddListener(() =>
+     clientButton.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.StartClient();
+            if(string.IsNullOrEmpty(joinCodeInput.text))
+            {
+                return;
+            }
+
+            hostButton.gameObject.SetActive(false);
+            clientButton.gameObject.SetActive(false);
+            joinCodeInput.gameObject.SetActive(false);
+
+            MR_TestRelayScript.Instance.JoinRelay(joinCodeInput.text);
         });
     }
 }
