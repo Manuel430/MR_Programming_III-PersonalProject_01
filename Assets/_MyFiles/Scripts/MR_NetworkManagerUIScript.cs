@@ -5,6 +5,8 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEditor.PackageManager;
 
 public class MR_NetworkManagerUIScript : NetworkBehaviour
 {
@@ -17,6 +19,8 @@ public class MR_NetworkManagerUIScript : NetworkBehaviour
     {
         joinCodeText.text = MR_TestRelayScript.Instance.JoinCode;
     }
+
+
 
     private void Awake()
     {
@@ -46,4 +50,15 @@ public class MR_NetworkManagerUIScript : NetworkBehaviour
             MR_TestRelayScript.Instance.JoinRelay(joinCodeInput.text);
         });
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(0);
+    }
+
 }

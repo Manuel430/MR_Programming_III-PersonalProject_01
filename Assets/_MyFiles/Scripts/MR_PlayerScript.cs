@@ -82,6 +82,11 @@ public class MR_PlayerScript : NetworkBehaviour
             Vector3 movementDirection = new Vector3(inputVector.x, 0, inputVector.y);
             ProcessMovement_ServerRpc(movementDirection);
         }
+
+        if(IsOwner && Input.GetKeyDown(KeyCode.Backspace))
+        {
+            NetworkManager.Singleton.DisconnectClient(1);   
+        }
     }
 
     private void LateUpdate()
@@ -91,6 +96,8 @@ public class MR_PlayerScript : NetworkBehaviour
             Vector2 lookVector = playerControls.Player.Look.ReadValue<Vector2>();
         }
     }
+
+
 
     [ServerRpc]
     public void ProcessMovement_ServerRpc(Vector3 movementDirection)
@@ -108,6 +115,10 @@ public class MR_PlayerScript : NetworkBehaviour
     {
         //xRotation -= (lookVector.y * Time.deltaTime) * ySensitivity;
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
+        if(playerCam == null)
+        {
+            return;
+        }
         playerCam.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         transform.Rotate(Vector3.up * (lookVector.x * Time.deltaTime) * xSensitivity);
         ServerUpdateRotation_ServerRpc(transform.rotation);
