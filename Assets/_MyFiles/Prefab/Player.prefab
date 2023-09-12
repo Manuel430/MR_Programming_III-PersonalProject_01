@@ -2551,6 +2551,7 @@ MonoBehaviour:
   hunterBody_02: {fileID: 1279256322133848217}
   gun_01: {fileID: 8963559297223198297}
   gun_02: {fileID: 214633904469013466}
+  playerDisconnectScreen: {fileID: 8695158279896608648, guid: 9ef8f279aa92746458626219826a5a79, type: 3}
 --- !u!114 &1857382921069232843
 MonoBehaviour:
   m_ObjectHideFlags: 0

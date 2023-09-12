@@ -6,6 +6,8 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using TMPro;
 
 public class MR_PlayerScript : NetworkBehaviour
 {
@@ -25,6 +27,8 @@ public class MR_PlayerScript : NetworkBehaviour
     public GameObject hunterBody_02;
     public GameObject gun_01;
     public GameObject gun_02;
+
+    public GameObject playerDisconnectScreen;
 
     private void Awake()
     {
