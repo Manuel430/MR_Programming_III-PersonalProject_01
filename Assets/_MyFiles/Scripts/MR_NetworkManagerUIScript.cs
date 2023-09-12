@@ -19,7 +19,10 @@ public class MR_NetworkManagerUIScript : NetworkBehaviour
         joinCodeText.text = MR_TestRelayScript.Instance.JoinCode;
     }
 
-
+    private void OnPlayerDisconnected()
+    {
+        Debug.Log("Player has left the server");
+    }
 
     private void Awake()
     {
