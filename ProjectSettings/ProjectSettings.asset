@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: PrimalKnightGames
-  productName: PP01_Test_03
+  productName: Personal Project 01
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -154,7 +154,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Standalone: com.PrimalKnightGames.PP01-Test-02
+    Standalone: com.PrimalKnightGames.PP01-Test-03
   buildNumber:
     Standalone: 0
     VisionOS: 0
